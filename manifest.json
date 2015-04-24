@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "Stops your annoying gifs",
+  "description": "This extension allows you to stop annoying gifs in the current page",
+  "version": "1.0",
+
+  "permissions": [
+      "contextMenus"
+  ],
+
+  "content_scripts": [{
+      "matches": ["*://*/*"],
+      "js":      ["content.js"]
+  }],
+
+ "background": {
+      "scripts": ["main.js"]
+  }
+}
