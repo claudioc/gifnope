@@ -1,4 +1,4 @@
-function stopAllGifs(info, tab) {
+function pauseAllGifs(info, tab) {
 
     chrome.tabs.sendMessage(tab.id, {
             sender: "GIFNOPE",
@@ -10,7 +10,7 @@ function stopAllGifs(info, tab) {
     );
 }
 
-function stopGif(info, tab) {
+function pauseGif(info, tab) {
 
     var src = info.srcUrl,
         window = chrome.extension.getBackgroundPage();
@@ -29,13 +29,13 @@ function stopGif(info, tab) {
 var ctxMenuPauseId = chrome.contextMenus.create({
     "title": "Pause animation",
     "contexts": ["image"],
-    "onclick": stopGif
+    "onclick": pauseGif
 });
 
 var ctxMenuPauseAllId = chrome.contextMenus.create({
     "title": "Pause all animations",
     "contexts": ["page"],
-    "onclick": stopAllGifs
+    "onclick": pauseAllGifs
 });
 
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {

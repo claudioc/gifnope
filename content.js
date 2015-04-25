@@ -1,4 +1,27 @@
 
+var pauseMeMaybe = false;
+var pauseTimeout;
+var escHandler;
+
+document.addEventListener('keydown', escHandler = function(evt) {
+
+    if (evt.keyCode == 27) {
+
+        clearTimeout(pauseTimeout);
+
+        if (pauseMeMaybe) {
+            document.removeEventListener('keydown', escHandler);
+            pauseAllGifs();
+        }
+        else {
+            pauseMeMaybe = true;
+            pauseTimeout = setTimeout(function () {
+                pauseMeMaybe = false;
+            }, 500);
+        }
+    }
+});
+
 document.addEventListener('mousedown', function(evt) {
 
     // Only interested on the context menu
@@ -11,7 +34,7 @@ document.addEventListener('mousedown', function(evt) {
         return;
     }
 
-    // If the target is not a gif, bye.
+    // If the target is not a gif, disable our menu
     if (!/\.gif($|\?)/i.test(event.target.src)) {
         chrome.extension.sendMessage({
             sender: "GIFNOPE",
@@ -26,42 +49,43 @@ document.addEventListener('mousedown', function(evt) {
     });
 });
 
-/* Listen for messages */
 chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
 
     if (msg.sender && (msg.sender == "GIFNOPE")) {
 
         if (msg.command == "PAUSE_ALL") {
 
-            var gifs = window.document.querySelectorAll("img");
-
-            for (var i=0, l = gifs.length; i < l; i++) {
-
-                if (/\.gif($|\?)/i.test(gifs[i].src)) {
-                    stopGif(gifs[i]);
-                }
-            }
+            pauseAllGifs();
         }
 
         if (msg.command == "PAUSE") {
 
-            var gif;
-
-            gif = window.document.querySelector("[src='" + msg.target + "']");
-
-            if (!gif) {
-                alert("Can't reach this image. It may be inside an iframe.");
-                return;
-            }
-
-            stopGif(gif);
+            pauseGif(window.document.querySelector("[src='" + msg.target + "']"));
         }
 
+        // Useless
         sendResponse();
     }
 });
 
-function stopGif(gif) {
+function pauseAllGifs() {
+
+    var gifs = window.document.querySelectorAll("img");
+
+    for (var i=0, l = gifs.length; i < l; i++) {
+
+        if (/\.gif($|\?)/i.test(gifs[i].src)) {
+            pauseGif(gifs[i]);
+        }
+    }
+}
+
+function pauseGif(gif) {
+
+    if (!gif) {
+        alert("Can't reach this image. It may be inside an iframe.");
+        return;
+    }
 
     waitUntilReady();
 
@@ -108,5 +132,4 @@ function stopGif(gif) {
             canvas.parentNode.replaceChild(gif, canvas);
         });
     }
-
 }
