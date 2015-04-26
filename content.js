@@ -2,6 +2,7 @@
 var pauseMeMaybe = false;
 var pauseTimeout;
 var escHandler;
+var gifre = new RegExp(/\.gif($|\?)/i);
 
 document.addEventListener('keydown', escHandler = function(evt) {
 
@@ -18,7 +19,25 @@ document.addEventListener('keydown', escHandler = function(evt) {
             pauseMeMaybe = true;
             pauseTimeout = setTimeout(function () {
                 pauseMeMaybe = false;
-            }, 500);
+            }, 1000);
+        }
+    }
+});
+
+window.addEventListener('click', function(evt) {
+
+    // If the target is not a image, bye.
+    if (event.target.tagName != 'IMG') {
+
+        return;
+    }
+
+    if (pauseMeMaybe) {
+
+        // If the target is a gif, pause it
+        if (gifre.test(event.target.src)) {
+
+            pauseGif(event.target);
         }
     }
 });
@@ -36,7 +55,7 @@ document.addEventListener('mousedown', function(evt) {
     }
 
     // If the target is not a gif, disable our menu
-    if (!/\.gif($|\?)/i.test(event.target.src)) {
+    if (!gifre.test(event.target.src)) {
         chrome.extension.sendMessage({
             sender: "GIFNOPE",
             command: "DISABLE_MENU"
@@ -75,7 +94,7 @@ function pauseAllGifs() {
 
     for (var i=0, l = gifs.length; i < l; i++) {
 
-        if (/\.gif($|\?)/i.test(gifs[i].src)) {
+        if (gifre.test(gifs[i].src)) {
             pauseGif(gifs[i]);
         }
     }
@@ -111,7 +130,13 @@ function pauseGif(gif) {
         display = document.defaultView.getComputedStyle(gif, "").display;
 
         ctx = canvas.getContext('2d');
-        ctx.drawImage(gif, 0, 0, gif.width, gif.height);
+
+        try {
+            ctx.drawImage(gif, 0, 0, gif.width, gif.height);
+        } catch(e) {
+            console.log("Gifnope: cannot drawImage");
+            return;
+        }
 
         var x = canvas.width / 2;
         var y = canvas.height / 2;

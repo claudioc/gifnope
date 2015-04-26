@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
 
-  "name": "Stops your annoying gifs",
+  "name": "Gifnope",
   "description": "This extension allows you to stop annoying gifs in the current page",
   "version": "1.0",
 
@@ -19,6 +19,6 @@
   }],
 
  "background": {
-      "scripts": ["main.js"]
+      "scripts": ["background.js"]
   }
 }
