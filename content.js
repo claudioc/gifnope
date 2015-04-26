@@ -12,6 +12,7 @@ document.addEventListener('keydown', escHandler = function(evt) {
         if (pauseMeMaybe) {
             document.removeEventListener('keydown', escHandler);
             pauseAllGifs();
+            console.log("Gifnope extension: all gifs paused because you pressed the esc key twice.")
         }
         else {
             pauseMeMaybe = true;
